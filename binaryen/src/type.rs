@@ -3,11 +3,6 @@ use crate::sys::*;
 use crate::generated::*;
 
 #[derive(Eq, PartialEq, Copy, Clone, Hash)]
-enum BasicType {
-
-}
-
-#[derive(Eq, PartialEq, Copy, Clone, Hash)]
 #[repr(transparent)]
 pub struct Type(BinaryenType);
 
@@ -28,6 +23,11 @@ impl Type {
 }
 
 impl Type {
+    #[inline]
+    pub(crate) const fn from_raw(raw: BinaryenType) -> Type {
+        Type(raw)
+    }
+
     pub fn new(value_types: &[Type]) -> Type {
         // Unrealistic to hit over u32::MAX value types in a single call...
         debug_assert!(value_types.len() <= (u32::MAX as usize), "maximum amount of value types exceeded");
@@ -58,5 +58,23 @@ impl Type {
     #[inline]
     pub(crate) const fn to_raw(self) -> BinaryenType {
         self.0
+    }
+}
+
+impl From<(Type, Type)> for Type {
+    fn from((t1, t2): (Type, Type)) -> Self {
+        Type::new(&[t1, t2])
+    }
+}
+
+impl From<(Type, Type, Type)> for Type {
+    fn from((t1, t2, t3): (Type, Type, Type)) -> Self {
+        Type::new(&[t1, t2, t3])
+    }
+}
+
+impl From<(Type, Type, Type, Type)> for Type {
+    fn from((t1, t2, t3, t4): (Type, Type, Type, Type)) -> Self {
+        Type::new(&[t1, t2, t3, t4])
     }
 }
